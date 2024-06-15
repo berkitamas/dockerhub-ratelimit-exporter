@@ -7,7 +7,7 @@ import time
 from typing import Optional
 
 import requests
-from prometheus_client import start_http_server, Summary, REGISTRY
+from prometheus_client import start_http_server, REGISTRY
 from prometheus_client.metrics_core import GaugeMetricFamily
 
 
