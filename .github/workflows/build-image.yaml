@@ -16,6 +16,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
+    env:
+      IMAGE_NAME: ${{ github.repository }}
     steps:
       - name: Check Out Repository
         uses: actions/checkout@v4
@@ -44,7 +50,7 @@ jobs:
       - id: docker_meta
         uses: docker/metadata-action@v4.4.0
         with:
-          images: berkitamas/dockerhub-ratelimit-exporter
+          images: ${{ env.IMAGE_NAME }}
           tags: type=sha,format=long
 
       - name: Build and Push
@@ -56,7 +62,7 @@ jobs:
           push: true
           sbom: true
           platforms: linux/amd64,linux/arm64
-          tags: berkitamas/dockerhub-ratelimit-exporter:${{ env.app_version_oci }},berkitamas/dockerhub-ratelimit-exporter:latest
+          tags: ${{ env.IMAGE_NAME }}:${{ env.app_version_oci }},${{ env.IMAGE_NAME }}:latest
 
       - name: Sign the images with GitHub OIDC Token
         env:
@@ -68,3 +74,11 @@ jobs:
             images+="${tag}@${DIGEST} "
           done
           cosign sign --yes ${images}
+
+      - name: Attest
+        uses: actions/attest-build-provenance@v1
+        id: attest
+        with:
+          subject-name: index.docker.io/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build-and-push.outputs.digest }}
+          push-to-registry: true
