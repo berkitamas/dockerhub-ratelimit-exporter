@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  {{- with .Values.extraAnnotations }}
+  annotations:
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
+  name: {{ include "dockerhub-ratelimit-exporter.fullname" . }}
+  labels:
+    {{- include "dockerhub-ratelimit-exporter.labels" . | nindent 4 }}
+    {{- with .Values.extraLabels }}
+      {{ toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "dockerhub-ratelimit-exporter.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.extraAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "dockerhub-ratelimit-exporter.selectorLabels" . | nindent 8 }}
+        {{- with .Values.extraLabels }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "dockerhub-ratelimit-exporter.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if or (or .Values.dockerHubCredentials.existingSecret (and .Values.dockerHubCredentials.username .Values.dockerHubCredentials.password)) .Values.extraEnvFrom }}
+          envFrom:
+          {{- if .Values.dockerHubCredentials.existingSecret }}
+            - secretRef:
+                name: {{ .Values.dockerHubCredentials.existingSecret }}
+          {{- else }}
+            - secretRef:
+                name: {{ include "dockerhub-ratelimit-exporter.fullname" . }}
+          {{- end }}
+          {{- with .Values.extraEnvFrom }}
+          {{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.extraVolumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

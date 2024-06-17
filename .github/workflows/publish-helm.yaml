@@ -1,0 +1,31 @@
+name: Publish Helm chart
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - .github/workflows/publish-helm.yaml
+      - deploy/helm/dockerhub-ratelimit-exporter /**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ${{ github.repository }}
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+
+      - name: Helm Package
+        run: echo "PACKAGE_PATH=$(helm package deploy/helm/dockerhub-ratelimit-exporter-chart  | awk '{print $NF}')" >> $GITHUB_ENV
+
+      - name: Publish Helm chart
+        run: |
+          helm registry login registry-1.docker.io -u ${{ vars.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+          helm push ${{ env.PACKAGE_PATH }} oci://registry-1.docker.io/${{ vars.REGISTRY_USERNAME }}
