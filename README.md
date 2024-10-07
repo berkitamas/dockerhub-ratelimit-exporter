@@ -36,8 +36,7 @@ python app.py
 Usage
 -----
 ```
-usage: app.py [-h] [-p PORT] [-l LISTEN] [--tls-crt TLS_CRT]
-              [--tls-key TLS_KEY] [-v]
+usage: app.py [-h] [-p PORT] [-l LISTEN] [--tls-crt TLS_CRT] [--tls-key TLS_KEY] [--timeout TIMEOUT] [-v]
 
 Prometheus collector for Docker Hub rate limits
 
@@ -48,7 +47,9 @@ options:
                         Address to listen from (default: 0.0.0.0)
   --tls-crt TLS_CRT     TLS certificate file for HTTPS
   --tls-key TLS_KEY     TLS private key file for HTTPS
+  --timeout TIMEOUT     Timeout of requests in seconds towards Docker Hub (default: 15)
   -v, --verbose         Enable verbose logs
+
 ```
 
 Exposed metrics

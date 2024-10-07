@@ -1,0 +1,13 @@
+{{ template "chart.header" . }}
+{{ template "chart.versionBadge" . }}
+
+{{ template "chart.description" . }}
+
+## Installation
+Using values from a file:
+
+```bash
+helm install -f values.yaml `HELM_RELEASE_NAME` . -n `NAMESPACE`
+```
+
+{{ template "chart.valuesSection" . }}
