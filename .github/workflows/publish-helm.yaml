@@ -15,12 +15,12 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
     steps:
       - name: Check Out Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.0
         with:
           fetch-depth: 0
 
       - name: Install Helm
-        uses: azure/setup-helm@v3
+        uses: azure/setup-helm@v4.2.0
 
       - name: Helm Package
         run: echo "PACKAGE_PATH=$(helm package deploy/helm/dockerhub-ratelimit-exporter-chart  | awk '{print $NF}')" >> $GITHUB_ENV
