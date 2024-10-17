@@ -55,12 +55,12 @@ Exposed metrics
 ---------------
 (excluding common metrics)
 ```
-# HELP pulls_remaining Remaining pulls for Docker Hub
-# TYPE pulls_remaining gauge
-pulls_remaining{interval="21600",source="<IP address or user UUID>"} 96.0
-# HELP pulls_total Total allowed pulls for Docker Hub
-# TYPE pulls_total gauge
-pulls_total{interval="21600",source="<IP address or user UUID>"} 100.0
+# HELP dockerhub_pulls_remaining Remaining pulls for Docker Hub
+# TYPE dockerhub_pulls_remaining gauge
+dockerhub_pulls_remaining{interval="21600",source="<IP address or user UUID>"} 96.0
+# HELP dockerhub_pulls_total Total allowed pulls for Docker Hub
+# TYPE dockerhub_pulls_total gauge
+dockerhub_pulls_total{interval="21600",source="<IP address or user UUID>"} 100.0
 ```
 
 Environment variables

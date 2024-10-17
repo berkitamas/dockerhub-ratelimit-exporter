@@ -94,7 +94,7 @@ class DockerHubCollector(object):
         """
         limits = self._retrieve_rate_limit()
         pulls_remaining = GaugeMetricFamily(
-            name="pulls_remaining",
+            name="dockerhub_pulls_remaining",
             documentation="Remaining pulls for Docker Hub",
             labels=["interval", "source"]
         )
@@ -102,7 +102,7 @@ class DockerHubCollector(object):
         yield pulls_remaining
 
         pulls_total = GaugeMetricFamily(
-            name="pulls_total",
+            name="dockerhub_pulls_total",
             documentation="Total allowed pulls for Docker Hub",
             labels=["interval", "source"]
         )
