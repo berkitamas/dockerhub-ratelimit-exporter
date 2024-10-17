@@ -193,8 +193,12 @@ def main():
             addr=options.listen
         )
     REGISTRY.register(DockerHubCollector(os.getenv("DOCKER_HUB_USERNAME"), os.getenv("DOCKER_HUB_PASSWORD")))
-    while True:
-        time.sleep(1)
+    logging.info(f"Exporter started at {'https' if use_https else 'http'}://{options.listen}:{options.port}")
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        logging.info("Shutting down...")
 
 
 if __name__ == "__main__":
