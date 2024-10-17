@@ -1,3 +1,6 @@
+![GitHub Release](https://img.shields.io/github/v/release/berkitamas/dockerhub-ratelimit-exporter) ![GitHub License](https://img.shields.io/github/license/berkitamas/dockerhub-ratelimit-exporter)
+
+
 Docker Hub rate limit exporter
 ==============================
 
@@ -10,10 +13,16 @@ Installation
 ### Using Docker image
 ```
 # Anonymous
-docker run -p 8000:8000 -it --rm docker.io/berkitamas/dockerhub-ratelimit-exporter:<tag or latest>
+docker run -it --rm \
+  -p 8000:8000 \
+  docker.io/berkitamas/dockerhub-ratelimit-exporter:<tag or latest>
 
 # Authenticated
-docker run -p 8000:8000 -it --rm -e DOCKER_HUB_USERNAME="username" -e DOCKER_HUB_PASSWORD="changeme" docker.io/berkitamas/dockerhub-ratelimit-exporter:<tag or latest>
+docker run -it --rm \
+  -p 8000:8000 \
+  -e DOCKER_HUB_USERNAME="username" \
+  -e DOCKER_HUB_PASSWORD="changeme" \
+  docker.io/berkitamas/dockerhub-ratelimit-exporter:<tag or latest>
 ```
 ### Manually
 ```
@@ -40,6 +49,18 @@ options:
   --tls-crt TLS_CRT     TLS certificate file for HTTPS
   --tls-key TLS_KEY     TLS private key file for HTTPS
   -v, --verbose         Enable verbose logs
+```
+
+Exposed metrics
+---------------
+(excluding common metrics)
+```
+# HELP pulls_remaining Remaining pulls for Docker Hub
+# TYPE pulls_remaining gauge
+pulls_remaining{interval="21600",source="<IP address or user UUID>"} 96.0
+# HELP pulls_total Total allowed pulls for Docker Hub
+# TYPE pulls_total gauge
+pulls_total{interval="21600",source="<IP address or user UUID>"} 100.0
 ```
 
 Environment variables
