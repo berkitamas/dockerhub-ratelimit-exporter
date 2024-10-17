@@ -12,6 +12,7 @@ import time
 from typing import Optional
 
 import requests
+import urllib3
 from prometheus_client import start_http_server, REGISTRY
 from prometheus_client.metrics_core import GaugeMetricFamily
 
@@ -35,7 +36,9 @@ class DockerHubCollector:
             self,
             username: Optional[str] = "",
             password: Optional[str] = "",
-            request_timeout: int = 15
+            request_timeout: int = 15,
+            max_retries: int = 5,
+            retry_backoff_factor: float = 2
     ):
         """
         Initialize the Docker Hub collector with the given username and password.
@@ -49,6 +52,8 @@ class DockerHubCollector:
         self._username = "" if username is None else username
         self._password = "" if password is None else password
         self._request_timeout = request_timeout
+        self._max_retries = max_retries
+        self._retry_backoff_factor = retry_backoff_factor
 
         if not isinstance(self._username, str) or not isinstance(self._password, str):
             raise ValueError("username and password must be strings")
@@ -86,9 +91,17 @@ class DockerHubCollector:
         else:
             authentication = None
 
+        # Custom retry
+        session = requests.Session()
+        session.mount("https://", requests.adapters.HTTPAdapter(max_retries=urllib3.util.Retry(
+            total=self._max_retries,
+            backoff_factor=self._retry_backoff_factor,
+            status_forcelist=[429, 500, 502, 503, 504],
+        )))
+
         # If authenticated method is used, then HTTP
-        resp = requests.get(
-            url="https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull", # pylint: disable=line-too-long
+        resp = session.get(
+            url="https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull",  # pylint: disable=line-too-long
             auth=authentication,
             json=True,
             timeout=self._request_timeout
@@ -100,7 +113,7 @@ class DockerHubCollector:
         headers = {
             "Authorization": f"Bearer {resp.json()['token']}"
         }
-        resp = requests.head(
+        resp = session.head(
             url="https://registry-1.docker.io/v2/ratelimitpreview/test/manifests/latest",
             headers=headers,
             timeout=self._request_timeout
@@ -153,7 +166,11 @@ class DockerHubCollector:
         """
         Prometheus collector function
         """
-        limits = self.retrieve_rate_limit()
+        try:
+            limits = self.retrieve_rate_limit()
+        except requests.exceptions.RequestException as e:
+            logging.exception("Error occurred while retrieving data from Docker Hub:", exc_info=e)
+            return
         pulls_remaining = GaugeMetricFamily(
             name="dockerhub_pulls_remaining",
             documentation="Remaining pulls for Docker Hub",
@@ -188,6 +205,9 @@ def validate_arguments(options):
 
     if options.timeout < 1:
         raise ValueError("Timeout must be a positive number")
+
+    if options.max_retries < 0:
+        raise ValueError("Maximum retries must be a positive number or zero")
 
     # Listen address check
     ip_regex = re.compile(r"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$")
@@ -233,6 +253,18 @@ def main():
         type=int,
         default=15,
         help="Timeout of requests in seconds towards Docker Hub (default: 15)",
+    )
+    parser.add_argument(
+        "--max-retries",
+        type=int,
+        default=5,
+        help="Maximum retries towards Docker Hub (default: 5)",
+    )
+    parser.add_argument(
+        "--retry-backoff-factor",
+        type=float,
+        default=2,
+        help="Incremental retry backoff factor towards Docker Hub (default: 2)",
     )
     parser.add_argument(
         '-v', '--verbose',
@@ -281,7 +313,9 @@ def main():
         DockerHubCollector(
             os.getenv("DOCKER_HUB_USERNAME"),
             os.getenv("DOCKER_HUB_PASSWORD"),
-            options.timeout
+            options.timeout,
+            options.max_retries,
+            options.retry_backoff_factor
         )
     )
     logging.info("Exporter started at %s://%s:%d",

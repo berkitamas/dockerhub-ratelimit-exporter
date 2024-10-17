@@ -5,5 +5,5 @@ home: https://github.com/berkitamas/dockerhub-ratelimit-exporter
 maintainers:
   - name: Tamas Berki
 type: application
-version: 1.0.3
-appVersion: "1.0.3"
+version: 1.0.4
+appVersion: "1.0.4"

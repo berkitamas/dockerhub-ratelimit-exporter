@@ -45,6 +45,12 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.extraArgs }}
+          args:
+          {{- range . }}
+            - {{ . }}
+          {{- end }}
+          {{- end }}
           {{- if or (or .Values.dockerHubCredentials.existingSecret (and .Values.dockerHubCredentials.username .Values.dockerHubCredentials.password)) .Values.extraEnvFrom }}
           envFrom:
           {{- if .Values.dockerHubCredentials.existingSecret }}

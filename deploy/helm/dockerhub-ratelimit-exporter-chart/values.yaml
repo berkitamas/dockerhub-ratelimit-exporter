@@ -1,82 +1,93 @@
-# Default values for dockerhub-ratelimit-exporter.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
+# -- Number of replicas
 replicaCount: 1
 
 image:
+  # -- Repository of the image
   repository: berkitamas/dockerhub-ratelimit-exporter
+  # -- Image Pull Policy of the image
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
+# -- Image Pull Secrets of the image
 imagePullSecrets: []
+
+# -- Overrides the name of the chart
 nameOverride: ""
+
+# -- Overrides the full name of the resources (by default it is prepended by the chart name)
 fullnameOverride: ""
 
+# -- Extra annotations for the Deployment
 extraAnnotations: {}
 
+# -- Extra labels for the Deployment
 extraLabels: {}
 
+# -- Extra arguments for the container
+extraArgs: []
+
+# -- Extra environment variables for the container
 extraEnvVars: []
 
+# -- Extra environment variable mounts for the container
 extraEnvFrom: []
 
+# -- Extra volume mounts for the container
 extraVolumeMounts: []
 
+# -- Extra volumes for the container
 extraVolumes: []
 
+# -- Extra init containers for the container
 initContainers: []
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template.
   name: ""
 
+# -- Security context of the pod
 podSecurityContext: {}
-  # fsGroup: 2000
 
+# -- Security context of the container
 securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
 service:
+  # -- Service type
   type: ClusterIP
+  # -- Service port (should align with the arguments)
   port: 8000
 
+# -- Resources of the Pod
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
 
+# -- Node selector for the Pod
 nodeSelector: {}
 
+# -- Tolerations for the Pod
 tolerations: []
 
+# -- Affinity rules for the Pod
 affinity: {}
 
 dockerHubCredentials:
+  # -- Existing secret where the credentials are retrieved (must have username and password key)
   existingSecret: null
+  # -- Username of Docker Hub user (mutually exclusive with existingSecret)
   username: null
+  # -- Password/Token of Docker Hub user (mutually exclusive with existingSecret)
   password: null
 
 serviceMonitor:
+  # -- Whether enable the serviceMonitor
   enabled: false
+  # -- Prometheus scrape interval
   interval:
+  # -- Prometheus metric relabelings
   metricRelabelings: {}
+  # -- Prometheus relabelings
   relabelings: {}
