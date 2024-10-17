@@ -6,7 +6,7 @@ on:
       - 'main'
     paths:
       - .github/workflows/publish-helm.yaml
-      - deploy/helm/dockerhub-ratelimit-exporter /**
+      - deploy/helm/dockerhub-ratelimit-exporter-chart/**
 
 jobs:
   build:

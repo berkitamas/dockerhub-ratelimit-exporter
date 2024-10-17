@@ -55,7 +55,7 @@ spec:
                 name: {{ include "dockerhub-ratelimit-exporter.fullname" . }}
           {{- end }}
           {{- with .Values.extraEnvFrom }}
-          {{ toYaml . | indent 12 }}
+          {{ toYaml . | nindent 12 }}
           {{- end }}
           {{- end }}
           {{- with .Values.extraVolumeMounts }}
