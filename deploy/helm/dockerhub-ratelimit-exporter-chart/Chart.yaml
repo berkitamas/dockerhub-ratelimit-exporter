@@ -1,0 +1,9 @@
+apiVersion: v2
+name: dockerhub-ratelimit-exporter-chart
+description: Prometheus exporter for Docker Hub rate limits
+home: https://github.com/berkitamas/dockerhub-ratelimit-exporter
+maintainers:
+  - name: Tamas Berki
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
