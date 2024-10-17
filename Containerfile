@@ -13,4 +13,4 @@ RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
 
 COPY . .
 
-ENTRYPOINT [ "/usr/src/app/app.py" ]
+ENTRYPOINT [ "python", "/usr/src/app/app.py" ]
