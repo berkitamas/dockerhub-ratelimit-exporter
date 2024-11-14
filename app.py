@@ -196,6 +196,7 @@ def validate_arguments(options):
     :return: None
     :raises ValueError: If the port is not between 1 and 65535.
     :raises ValueError: If the timeout is less than 1 sec.
+    :raises ValueError: If the max_retries is a negative number.
     :raises ValueError: If the listen address is not a valid IP address in the format of '1.2.3.4'.
     :raises ValueError: If only one of TLS key or TLS certificate is provided without the other.
     """
