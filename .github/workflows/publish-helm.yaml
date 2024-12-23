@@ -15,7 +15,7 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
     steps:
       - name: Check Out Repository
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
 
